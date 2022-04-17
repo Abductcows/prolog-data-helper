@@ -55,6 +55,5 @@ def sort_file_overwrite(relative_filename: str):
     print('Sort failed, sorting in memory')
     with open(relative_filename, 'r', encoding='UTF-8') as file:
         lines = file.readlines()
-    print(lines)
     with open(relative_filename, 'w', encoding='UTF-8') as out:
         out.writelines(sorted(lines))

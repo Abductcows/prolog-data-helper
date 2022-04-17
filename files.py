@@ -4,6 +4,11 @@ from prolog_stuff import str_to_prolog_value, pl_predicate
 
 
 def txt_to_csv(base_file_name, first_int_index_transform):
+    """
+    Generates a .csv file from the .txt, where each value is matched to a table column, as per the pdf
+    :param base_file_name: the file name without extension
+    :param first_int_index_transform: stupid hack parameter to work for both houses and requests
+    """
     with open(f'{base_file_name}.txt', encoding='UTF-8') as file, \
             open(f'{base_file_name}.csv', 'w', encoding='UTF-8') as out:
         for line in file:
@@ -18,6 +23,11 @@ def txt_to_csv(base_file_name, first_int_index_transform):
 
 
 def csv_to_pl(base_file_name, predicates_used):
+    """
+    Generates the .pl file from the csv, using the predicate labels given
+    :param base_file_name: the file name without extension
+    :param predicates_used: the predicate names for the .pl generation
+    """
     with open(f'{base_file_name}.csv', encoding='UTF-8') as file, \
             open(f'{base_file_name}.pl', 'w', encoding='UTF-8') as out:
         category_name, predicates = predicates_used
@@ -35,6 +45,10 @@ def csv_to_pl(base_file_name, predicates_used):
 
 
 def sort_file_overwrite(relative_filename: str):
+    """
+    Sorts the file alphabetically on rows. Uses os utils if possible or defaults to in-memory sort
+    :param relative_filename: the file name relative to the script file being executed
+    """
     if os.name == 'posix':
         adjusted_filename = f'"./{relative_filename}"'
         delete = 'rm'

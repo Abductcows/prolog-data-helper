@@ -60,8 +60,10 @@ def sort_file_overwrite(relative_filename: str):
         move = 'move'
 
     exit_code = os.system(f'sort {adjusted_filename} > {adjusted_filename}.temp')
+
     if exit_code == 0:
         os.system(f'{move} {adjusted_filename}.temp {adjusted_filename}')
+        return
     else:
         os.system(f'{delete} {adjusted_filename}.temp')
 

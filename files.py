@@ -39,9 +39,14 @@ def csv_to_pl(base_file_name, predicates_used):
             # base
             out.write(pl_predicate(category_name, key))
 
-            # attributes
-            for i in range(len(predicates)):
+            # attributes excepting key
+            for i in range(1, len(predicates)):
                 out.write(pl_predicate(predicates[i], key, values[i]))
+
+        # key category mapping to itself
+        out.write(
+            f'{predicates[0]}(X, Y) :- {category_name}(X), Y = X.'
+        )
 
 
 def sort_file_overwrite(relative_filename: str):

@@ -10,6 +10,6 @@
 
 # Λοιπά
 
-- #### Ελέγθηκε για Windows 10 και Ubuntu 20.04.4 LTS με Python 3.9
+- #### Ελέγθηκε για Windows 10 και Ubuntu 20.04.4 LTS με Python 3.8.10
 
 

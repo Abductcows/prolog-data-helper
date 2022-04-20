@@ -1,5 +1,3 @@
-import os
-
 from prolog_stuff import str_to_prolog_value, pl_predicate
 
 
@@ -74,26 +72,26 @@ def sort_file_overwrite(relative_filename: str):
     Sorts the file alphabetically on rows. Uses os utils if possible or defaults to in-memory sort
     :param relative_filename: the file name relative to the script file being executed
     """
-    if os.name == 'posix':
-        adjusted_filename = f'"./{relative_filename}"'
-        delete = 'rm'
-        move = 'mv'
-    else:
-        adjusted_filename = relative_filename.replace('/', '\\')
-        adjusted_filename = f'".\\{adjusted_filename}"'
-        delete = 'del'
-        move = 'move'
-
-    exit_code = os.system(f'sort {adjusted_filename} > {adjusted_filename}.temp')
-
-    if exit_code == 0:
-        os.system(f'{move} {adjusted_filename}.temp {adjusted_filename}')
-        return
-    else:
-        os.system(f'{delete} {adjusted_filename}.temp')
-
-    # in-memory sort
-    print('Sort failed, sorting in memory')
+    # if os.name == 'posix':
+    #     adjusted_filename = f'"./{relative_filename}"'
+    #     delete = 'rm'
+    #     move = 'mv'
+    # else:
+    #     adjusted_filename = relative_filename.replace('/', '\\')
+    #     adjusted_filename = f'".\\{adjusted_filename}"'
+    #     delete = 'del'
+    #     move = 'move'
+    #
+    # exit_code = os.system(f'sort {adjusted_filename} > {adjusted_filename}.temp')
+    #
+    # if exit_code == 0:
+    #     os.system(f'{move} {adjusted_filename}.temp {adjusted_filename}')
+    #     return
+    # else:
+    #     os.system(f'{delete} {adjusted_filename}.temp')
+    #
+    # # in-memory sort
+    # print('Sort failed, sorting in memory')
     with open(relative_filename, 'r', encoding='UTF-8') as file:
         lines = file.readlines()
     with open(relative_filename, 'w', encoding='UTF-8') as out:

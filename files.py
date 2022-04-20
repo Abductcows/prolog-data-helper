@@ -37,7 +37,7 @@ def csv_to_pl(base_file_name, predicates_used):
 
         # "getters" for non-key fields
         for i in range(1, len(predicates)):
-            next_list = foo(len(predicates), i)
+            next_list = foo(len(predicates), i - 1)
             out.write(
                 f'{predicates[i]}(X, Value) :- {pl_predicate(category_name, *next_list)}'
             )

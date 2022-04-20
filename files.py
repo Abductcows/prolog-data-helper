@@ -32,21 +32,41 @@ def csv_to_pl(base_file_name, predicates_used):
             open(f'{base_file_name}.pl', 'w', encoding='UTF-8') as out:
         category_name, predicates = predicates_used
 
+        # records
         for line in file:
             values = list(map(str_to_prolog_value, line.rstrip().split(',')))
-            key = values[0]
+            out.write(pl_predicate(category_name, *values))
 
-            # base
-            out.write(pl_predicate(category_name, key))
+        # "getters" for non-key fields
+        for i in range(1, len(predicates)):
+            next_list = foo(len(predicates), i)
+            out.write(
+                f'{predicates[i]}(X, Value) :- {pl_predicate(category_name, *next_list)}'
+            )
 
-            # attributes excepting key
-            for i in range(1, len(predicates)):
-                out.write(pl_predicate(predicates[i], key, values[i]))
+        just_key = pl_predicate(category_name, *foo(len(predicates))).rstrip('.\n')
 
-        # key category mapping to itself
-        out.write(
-            f'{predicates[0]}(X, Y) :- {category_name}(X), Y = X.'
-        )
+        # getter for key
+        out.write(f'{predicates[0]}(X, Value) :- {just_key}, Value = X.\n')
+
+        # key based only category name predicate (to identify a house or request)
+        out.write(f'{category_name}(X) :- {just_key}.\n')
+
+
+def foo(n, index=None):
+    """
+    Generates the list ['X', _, _, _, ..., (i-th element) 'Value', _, ..] of total length n.
+
+    If index is not supplied, then all elements after the first are '_'
+    """
+    start = ['X']
+    if index is not None:
+        rest = ['_'] * (n - 2)
+        rest.insert(index, 'Value')
+    else:
+        rest = ['_'] * (n - 1)
+
+    return start + rest
 
 
 def sort_file_overwrite(relative_filename: str):

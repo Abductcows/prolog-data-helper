@@ -1,4 +1,5 @@
 from prolog_stuff import str_to_prolog_value, pl_predicate
+from collections import defaultdict
 
 
 def txt_to_csv(base_file_name, first_int_index_transform):
@@ -35,23 +36,27 @@ def csv_to_pl(base_file_name, predicates_used):
             values = list(map(str_to_prolog_value, line.rstrip().split(',')))
             out.write(pl_predicate(category_name, *values))
 
+        max_pred_length = max(map(len, predicates))
+
         # "getters" for non-key fields
         for i in range(1, len(predicates)):
-            next_list = foo(len(predicates), i - 1)
+            padding = ''.rjust(max_pred_length - len(predicates[i]))
+            next_list = select_attribute_i_list(len(predicates), i - 1)
             out.write(
-                f'{predicates[i]}(X, Value) :- {pl_predicate(category_name, *next_list)}'
+                f'{predicates[i]}(X, Value) :- {padding} {pl_predicate(category_name, *next_list)}'
             )
-
-        just_key = pl_predicate(category_name, *foo(len(predicates))).rstrip('.\n')
+        just_key = pl_predicate(category_name, *select_attribute_i_list(len(predicates))).rstrip('.\n')
 
         # getter for key
-        out.write(f'{predicates[0]}(X, Value) :- {just_key}, Value = X.\n')
+        padding = ''.rjust(max_pred_length - len(predicates[0]))
+        out.write(f'{predicates[0]}(X, Value) :- {padding} {just_key}, Value = X.\n')
 
         # key based only category name predicate (to identify a house or request)
-        out.write(f'{category_name}(X) :- {just_key}.\n')
+        padding = ''.rjust(max_pred_length - len(category_name) + len(', Value'))
+        out.write(f'{category_name}(X) :- {padding} {just_key}.\n')
 
 
-def foo(n, index=None):
+def select_attribute_i_list(n, index=None):
     """
     Generates the list ['X', _, _, _, ..., (i-th element) 'Value', _, ..] of total length n.
 
@@ -96,3 +101,29 @@ def sort_file_overwrite(relative_filename: str):
         lines = file.readlines()
     with open(relative_filename, 'w', encoding='UTF-8') as out:
         out.writelines(sorted(lines))
+
+
+def pretty_pl_sort(relative_filename: str, category_name: str):
+    with open(relative_filename, 'r', encoding='UTF-8') as file:
+        lines = file.readlines()
+
+    key_indexed_lines = defaultdict(list)
+
+    for line in lines:
+        key_indexed_lines[choose_key(line, category_name)].append(line)
+
+    with open(relative_filename, 'w', encoding='UTF-8') as out:
+        for key in sorted(key_indexed_lines):
+            out.writelines(key_indexed_lines[key])
+
+
+def choose_key(s: str, category_name):
+    if s.startswith(f'{category_name}('):
+        return 0
+
+    body = s[s.find(':-') + 2:]
+    rparen = body.find(')')
+    val = body.find('Value')
+    if val < rparen:
+        return 1
+    return 2

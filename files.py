@@ -11,6 +11,8 @@ def txt_to_csv(base_file_name, first_int_index_transform):
     with open(f'{base_file_name}.txt', encoding='UTF-8') as file, \
             open(f'{base_file_name}.csv', 'w', encoding='UTF-8') as out:
         for line in file:
+            if line.isspace():
+                continue
             words = line.rstrip().split(' ')
             first_number_index = next((i for i, word in enumerate(words) if word.isdigit()))
             if first_int_index_transform is not None:
@@ -33,6 +35,8 @@ def csv_to_pl(base_file_name, predicates_used):
 
         # records
         for line in file:
+            if line.isspace():
+                continue
             values = list(map(str_to_prolog_value, line.rstrip().split(',')))
             out.write(pl_predicate(category_name, *values))
 

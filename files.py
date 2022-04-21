@@ -1,5 +1,7 @@
-from prolog_stuff import str_to_prolog_value, pl_predicate
 from collections import defaultdict
+
+from args import GenMode
+from prolog_stuff import str_to_prolog_value, pl_predicate
 
 
 def txt_to_csv(base_file_name, first_int_index_transform):
@@ -23,22 +25,27 @@ def txt_to_csv(base_file_name, first_int_index_transform):
             out.write(f'{csvs}\n')
 
 
-def csv_to_pl(base_file_name, predicates_used):
+def csv_to_pl(base_file_name, predicates_used, gen_mode: GenMode):
     """
     Generates the .pl file from the csv, using the predicate labels given
     :param base_file_name: the file name without extension
     :param predicates_used: the predicate names for the .pl generation
+    :param gen_mode: scope of code generation
     """
     with open(f'{base_file_name}.csv', encoding='UTF-8') as file, \
             open(f'{base_file_name}.pl', 'w', encoding='UTF-8') as out:
         category_name, predicates = predicates_used
 
         # records
-        for line in file:
-            if line.isspace():
-                continue
-            values = list(map(str_to_prolog_value, line.rstrip().split(',')))
-            out.write(pl_predicate(category_name, *values))
+        if gen_mode & GenMode.RECORDS:
+            for line in file:
+                if line.isspace():
+                    continue
+                values = list(map(str_to_prolog_value, line.rstrip().split(',')))
+                out.write(pl_predicate(category_name, *values))
+
+        if not gen_mode & GenMode.RULES:
+            return
 
         max_pred_length = max(map(len, predicates))
 
